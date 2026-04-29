@@ -73,7 +73,8 @@ npm run dev
 ---
 
 ## 📸 Screenshots
-*(Add your screenshots here to make it look even better!)*
+<img width="1600" height="1036" alt="WhatsApp Image 2026-04-29 at 03 32 14" src="https://github.com/user-attachments/assets/fa4e8d58-58ae-4bdc-bcaf-d9be2050616e" />
+
 
 ---
 
