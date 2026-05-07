@@ -108,7 +108,7 @@ const getStatusConfig = (status: string) => {
       return {
         label: status,
         icon: Clock,
-        className: "bg-gray-100 text-gray-700",
+        className: "bg-muted text-muted-foreground",
       };
   }
 };
@@ -131,12 +131,12 @@ export function Dashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900">Dashboard</h2>
-          <p className="text-gray-500 mt-1">Welcome back! Here's your overview.</p>
+          <h2 className="text-2xl font-semibold text-foreground">Dashboard</h2>
+          <p className="text-muted-foreground mt-1">Welcome back! Here's your overview.</p>
         </div>
         <div className="flex gap-3">
           <Link to="/reports">
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" className="gap-2 border-border text-foreground hover:bg-muted">
               <Download className="w-4 h-4" />
               Generate Report
             </Button>
@@ -156,9 +156,9 @@ export function Dashboard() {
           <Card key={stat.title} className="p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-gray-600">{stat.title}</p>
-                <p className="text-3xl font-semibold text-gray-900 mt-2">{stat.value}</p>
-                <p className="text-sm text-green-600 mt-2">{stat.change} from last month</p>
+                <p className="text-sm text-muted-foreground">{stat.title}</p>
+                <p className="text-3xl font-semibold text-foreground mt-2">{stat.value}</p>
+                <p className="text-sm text-green-500 mt-2">{stat.change} from last month</p>
               </div>
               <div
                 className={`p-3 rounded-lg ${
@@ -197,8 +197,8 @@ export function Dashboard() {
                 <FileText className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <h3 className="font-medium text-gray-900">Create New Design</h3>
-                <p className="text-sm text-gray-500">Start a new project design</p>
+                <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">Create New Design</h3>
+                <p className="text-sm text-muted-foreground">Start a new project design</p>
               </div>
             </div>
           </Card>
@@ -211,8 +211,8 @@ export function Dashboard() {
                 <Package className="w-6 h-6 text-purple-600" />
               </div>
               <div>
-                <h3 className="font-medium text-gray-900">Run Optimization</h3>
-                <p className="text-sm text-gray-500">Optimize material cutting</p>
+                <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">Run Optimization</h3>
+                <p className="text-sm text-muted-foreground">Optimize material cutting</p>
               </div>
             </div>
           </Card>
@@ -225,8 +225,8 @@ export function Dashboard() {
                 <Download className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <h3 className="font-medium text-gray-900">Download Reports</h3>
-                <p className="text-sm text-gray-500">View and export reports</p>
+                <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">Download Reports</h3>
+                <p className="text-sm text-muted-foreground">View and export reports</p>
               </div>
             </div>
           </Card>
@@ -235,54 +235,54 @@ export function Dashboard() {
 
       {/* Recent Projects Table */}
       <Card className="overflow-hidden">
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-border">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-gray-900">Recent Projects</h3>
+            <h3 className="font-semibold text-foreground">Recent Projects</h3>
             <Link to="/reports">
-              <Button variant="ghost" size="sm">View All</Button>
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">View All</Button>
             </Link>
           </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead className="bg-muted/50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Project ID
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Name
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Date
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Cost
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-card divide-y divide-border">
               {recentProjects.map((project) => {
                 const statusConfig = getStatusConfig(project.status);
                 const StatusIcon = statusConfig.icon;
                 return (
-                  <tr key={project.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr key={project.id} className="hover:bg-muted/50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
                       {project.id}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                       {project.name}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                       {new Date(project.date).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
                       {project.cost}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

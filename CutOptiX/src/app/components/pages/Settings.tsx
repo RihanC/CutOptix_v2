@@ -10,10 +10,109 @@ import {
   Lock,
   Globe,
   Save,
-  Shield
+  Shield,
+  Camera,
+  Moon,
+  Sun
 } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { toast } from "sonner";
 
 export function Settings() {
+  const [user, setUser] = useState({ name: "", email: "", phone: "", company: "" });
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [passwords, setPasswords] = useState({ current: "", new: "", confirm: "" });
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem("currentUser");
+    if (savedUser) {
+      const parsedUser = JSON.parse(savedUser);
+      setUser({
+        name: parsedUser.name || "",
+        email: parsedUser.email || "",
+        phone: parsedUser.phone || "+1 (555) 123-4567",
+        company: parsedUser.company || "CutOptix Industries"
+      });
+    }
+
+    const savedImage = localStorage.getItem("profileImage");
+    if (savedImage) setProfileImage(savedImage);
+
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      setIsDarkMode(true);
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
+
+  const handleProfileSave = () => {
+    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+    const updatedUser = { ...currentUser, ...user };
+    localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+    
+    // Also update in user list
+    const users = JSON.parse(localStorage.getItem("cutoptix_users") || "[]");
+    const updatedUsers = users.map((u: any) => u.email === currentUser.email ? { ...u, ...user } : u);
+    localStorage.setItem("cutoptix_users", JSON.stringify(updatedUsers));
+    
+    toast.success("Profile updated successfully!");
+    window.location.reload(); // Refresh to update header
+  };
+
+  const handlePasswordUpdate = () => {
+    if (passwords.new !== passwords.confirm) {
+      toast.error("New passwords do not match!");
+      return;
+    }
+
+    const users = JSON.parse(localStorage.getItem("cutoptix_users") || "[]");
+    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+    
+    const userIndex = users.findIndex((u: any) => u.email === currentUser.email && u.password === passwords.current);
+    
+    if (userIndex === -1 && passwords.current !== "pass123") { // Special case for hardcoded admin
+      toast.error("Current password incorrect!");
+      return;
+    }
+
+    if (userIndex !== -1) {
+      users[userIndex].password = passwords.new;
+      localStorage.setItem("cutoptix_users", JSON.stringify(users));
+    }
+    
+    toast.success("Password updated successfully!");
+    setPasswords({ current: "", new: "", confirm: "" });
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setProfileImage(base64String);
+        localStorage.setItem("profileImage", base64String);
+        toast.success("Profile photo updated!");
+        window.location.reload();
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const toggleDarkMode = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    if (newMode) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+    toast.info(`Switched to ${newMode ? 'Dark' : 'Light'} Mode`);
+  };
   return (
     <div className="max-w-4xl space-y-6">
       {/* Header */}
@@ -34,11 +133,24 @@ export function Settings() {
         </div>
         <div className="p-6 space-y-6">
           <div className="flex items-center gap-6">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-medium">
-              A
+            <div className="relative group">
+              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-2xl font-medium overflow-hidden border-2 border-white shadow-sm">
+                {profileImage ? (
+                  <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  user.name.charAt(0).toUpperCase()
+                )}
+              </div>
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute -bottom-1 -right-1 p-1.5 bg-white rounded-full shadow-md border border-gray-100 text-gray-600 hover:text-blue-600 transition-colors"
+              >
+                <Camera className="w-3.5 h-3.5" />
+              </button>
+              <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageChange} />
             </div>
             <div>
-              <Button variant="outline" size="sm">Change Photo</Button>
+              <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>Change Photo</Button>
               <p className="text-xs text-gray-500 mt-2">JPG, PNG or GIF. Max size 2MB.</p>
             </div>
           </div>
@@ -46,24 +158,46 @@ export function Settings() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="fullName">Full Name</Label>
-              <Input id="fullName" defaultValue="Admin User" className="bg-white" />
+              <Input 
+                id="fullName" 
+                value={user.name} 
+                onChange={(e) => setUser({...user, name: e.target.value})}
+                className="bg-white" 
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
-              <Input id="email" type="email" defaultValue="admin@cutoptix.com" className="bg-white" />
+              <Input 
+                id="email" 
+                type="email" 
+                value={user.email} 
+                onChange={(e) => setUser({...user, email: e.target.value})}
+                className="bg-white" 
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">Phone Number</Label>
-              <Input id="phone" type="tel" defaultValue="+1 (555) 123-4567" className="bg-white" />
+              <Input 
+                id="phone" 
+                type="tel" 
+                value={user.phone} 
+                onChange={(e) => setUser({...user, phone: e.target.value})}
+                className="bg-white" 
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="company">Company</Label>
-              <Input id="company" defaultValue="CutOptix Industries" className="bg-white" />
+              <Input 
+                id="company" 
+                value={user.company} 
+                onChange={(e) => setUser({...user, company: e.target.value})}
+                className="bg-white" 
+              />
             </div>
           </div>
 
           <div className="pt-4 border-t border-gray-200">
-            <Button className="gap-2 bg-blue-600 hover:bg-blue-700">
+            <Button className="gap-2 bg-blue-600 hover:bg-blue-700" onClick={handleProfileSave}>
               <Save className="w-4 h-4" />
               Save Changes
             </Button>
@@ -84,17 +218,35 @@ export function Settings() {
         <div className="p-6 space-y-6">
           <div className="space-y-2">
             <Label htmlFor="currentPassword">Current Password</Label>
-            <Input id="currentPassword" type="password" className="bg-white" />
+            <Input 
+              id="currentPassword" 
+              type="password" 
+              value={passwords.current}
+              onChange={(e) => setPasswords({...passwords, current: e.target.value})}
+              className="bg-white" 
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="newPassword">New Password</Label>
-              <Input id="newPassword" type="password" className="bg-white" />
+              <Input 
+                id="newPassword" 
+                type="password" 
+                value={passwords.new}
+                onChange={(e) => setPasswords({...passwords, new: e.target.value})}
+                className="bg-white" 
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <Input id="confirmPassword" type="password" className="bg-white" />
+              <Input 
+                id="confirmPassword" 
+                type="password" 
+                value={passwords.confirm}
+                onChange={(e) => setPasswords({...passwords, confirm: e.target.value})}
+                className="bg-white" 
+              />
             </div>
           </div>
 
@@ -110,7 +262,7 @@ export function Settings() {
           </div>
 
           <div className="pt-4 border-t border-gray-200">
-            <Button className="gap-2 bg-purple-600 hover:bg-purple-700">
+            <Button className="gap-2 bg-purple-600 hover:bg-purple-700" onClick={handlePasswordUpdate}>
               <Save className="w-4 h-4" />
               Update Password
             </Button>
@@ -118,44 +270,23 @@ export function Settings() {
         </div>
       </Card>
 
-      {/* Notification Settings */}
+      {/* Appearance Settings */}
       <Card className="overflow-hidden">
         <div className="p-6 border-b border-gray-200 bg-gray-50">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Bell className="w-5 h-5 text-green-600" />
+            <div className="p-2 bg-yellow-100 rounded-lg">
+              {isDarkMode ? <Moon className="w-5 h-5 text-yellow-600" /> : <Sun className="w-5 h-5 text-yellow-600" />}
             </div>
-            <h3 className="font-semibold text-gray-900">Notifications</h3>
+            <h3 className="font-semibold text-gray-900">Appearance</h3>
           </div>
         </div>
-        <div className="p-6 space-y-4">
+        <div className="p-6">
           <div className="flex items-center justify-between py-3">
             <div>
-              <p className="font-medium text-gray-900">Email Notifications</p>
-              <p className="text-sm text-gray-500">Receive updates via email</p>
+              <p className="font-medium text-gray-900">Dark Mode</p>
+              <p className="text-sm text-gray-500">Adjust the appearance of the dashboard</p>
             </div>
-            <Switch defaultChecked />
-          </div>
-          <div className="flex items-center justify-between py-3">
-            <div>
-              <p className="font-medium text-gray-900">Project Completion Alerts</p>
-              <p className="text-sm text-gray-500">Get notified when projects are completed</p>
-            </div>
-            <Switch defaultChecked />
-          </div>
-          <div className="flex items-center justify-between py-3">
-            <div>
-              <p className="font-medium text-gray-900">Weekly Reports</p>
-              <p className="text-sm text-gray-500">Receive weekly performance summaries</p>
-            </div>
-            <Switch defaultChecked />
-          </div>
-          <div className="flex items-center justify-between py-3">
-            <div>
-              <p className="font-medium text-gray-900">Marketing Communications</p>
-              <p className="text-sm text-gray-500">Updates about new features and tips</p>
-            </div>
-            <Switch />
+            <Switch checked={isDarkMode} onCheckedChange={toggleDarkMode} />
           </div>
         </div>
       </Card>

@@ -80,10 +80,10 @@ export function DesignInput() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900">Design Input</h2>
-          <p className="text-gray-500 mt-1">Enter window and door specifications</p>
+          <h2 className="text-2xl font-semibold text-foreground">Design Input</h2>
+          <p className="text-muted-foreground mt-1">Enter window and door specifications</p>
         </div>
-        <Button onClick={addEntry} variant="outline" className="gap-2">
+        <Button onClick={addEntry} variant="outline" className="gap-2 border-border text-foreground hover:bg-muted">
           <Plus className="w-4 h-4" />
           Add Item
         </Button>
@@ -91,12 +91,12 @@ export function DesignInput() {
 
       {/* Input Form */}
       <Card className="overflow-hidden">
-        <div className="p-6 border-b border-gray-200 bg-gray-50">
+        <div className="p-6 border-b border-border bg-muted/30">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <FileInput className="w-5 h-5 text-blue-600" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <FileInput className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
-            <h3 className="font-semibold text-gray-900">Specification Details</h3>
+            <h3 className="font-semibold text-foreground">Specification Details</h3>
           </div>
         </div>
 
@@ -105,7 +105,7 @@ export function DesignInput() {
             <div key={entry.id} className="relative">
               {/* Entry Header */}
               <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-sm font-medium text-muted-foreground">
                   Item #{index + 1}
                 </span>
                 {entries.length > 1 && (
@@ -121,42 +121,42 @@ export function DesignInput() {
               </div>
 
               {/* Entry Form */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6 bg-gray-50 rounded-lg">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6 bg-blue-50/50 dark:bg-blue-900/10 rounded-xl border border-blue-100 dark:border-blue-900/30">
                 {/* Window/Door Code */}
                 <div className="space-y-2">
-                  <Label htmlFor={`code-${entry.id}`}>Window/Door Code *</Label>
+                  <Label htmlFor={`code-${entry.id}`} className="text-foreground">Window/Door Code *</Label>
                   <Input
                     id={`code-${entry.id}`}
                     placeholder="e.g., W-001"
                     value={entry.code}
                     onChange={(e) => updateEntry(entry.id, "code", e.target.value)}
-                    className="bg-white"
+                    className="bg-card text-foreground border-border"
                   />
                 </div>
 
                 {/* Width */}
                 <div className="space-y-2">
-                  <Label htmlFor={`width-${entry.id}`}>Width (mm) *</Label>
+                  <Label htmlFor={`width-${entry.id}`} className="text-foreground">Width (mm) *</Label>
                   <Input
                     id={`width-${entry.id}`}
                     type="number"
                     placeholder="e.g., 1200"
                     value={entry.width}
                     onChange={(e) => updateEntry(entry.id, "width", e.target.value)}
-                    className="bg-white"
+                    className="bg-card text-foreground border-border"
                   />
                 </div>
 
                 {/* Height */}
                 <div className="space-y-2">
-                  <Label htmlFor={`height-${entry.id}`}>Height (mm) *</Label>
+                  <Label htmlFor={`height-${entry.id}`} className="text-foreground">Height (mm) *</Label>
                   <Input
                     id={`height-${entry.id}`}
                     type="number"
                     placeholder="e.g., 1500"
                     value={entry.height}
                     onChange={(e) => updateEntry(entry.id, "height", e.target.value)}
-                    className="bg-white"
+                    className="bg-card text-foreground border-border"
                   />
                 </div>
 
@@ -222,8 +222,8 @@ export function DesignInput() {
 
                 {/* Mesh Toggle */}
                 <div className="space-y-2 flex flex-col justify-end">
-                  <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200">
-                    <Label htmlFor={`mesh-${entry.id}`} className="cursor-pointer">
+                  <div className="flex items-center justify-between p-4 bg-card rounded-lg border border-border">
+                    <Label htmlFor={`mesh-${entry.id}`} className="cursor-pointer text-foreground">
                       Include Mesh
                     </Label>
                     <Switch
@@ -239,17 +239,17 @@ export function DesignInput() {
 
               {/* Divider */}
               {index < entries.length - 1 && (
-                <div className="h-px bg-gray-200 my-6" />
+                <div className="h-px bg-border my-6" />
               )}
             </div>
           ))}
         </div>
 
         {/* Actions */}
-        <div className="p-6 border-t border-gray-200 bg-gray-50">
+        <div className="p-6 border-t border-border bg-muted/30">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-600">
-              Total Items: <span className="font-medium text-gray-900">{entries.length}</span>
+            <p className="text-sm text-muted-foreground">
+              Total Items: <span className="font-medium text-foreground">{entries.length}</span>
             </p>
             <div className="flex gap-3">
               <Button variant="outline" onClick={addEntry} className="gap-2">

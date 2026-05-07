@@ -5,25 +5,65 @@ import { toast } from "sonner";
 import loginBg from "@/assets/login-bg.png";
 
 export function LoginPage() {
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [role, setRole] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Hardcoded authentication logic as requested
     setTimeout(() => {
-      if (email === "sample1@test.com" && password === "pass123") {
-        localStorage.setItem("isAuthenticated", "true");
-        toast.success("Welcome back!");
-        navigate("/");
+      if (isSignUp) {
+        // Handle Registration
+        if (password !== confirmPassword) {
+          toast.error("Passwords do not match!");
+          setIsLoading(false);
+          return;
+        }
+
+        const usersStr = localStorage.getItem("cutoptix_users") || "[]";
+        const users = JSON.parse(usersStr);
+
+        if (users.some((u: any) => u.email === email)) {
+          toast.error("User already exists!");
+          setIsLoading(false);
+          return;
+        }
+
+        const newUser = { name, email, role, password };
+        users.push(newUser);
+        localStorage.setItem("cutoptix_users", JSON.stringify(users));
+        toast.success("Account created! Please sign in.");
+        setIsSignUp(false);
       } else {
-        toast.error("Invalid email or password. Please try again.");
+        // Handle Login
+        const usersStr = localStorage.getItem("cutoptix_users") || "[]";
+        const users = JSON.parse(usersStr);
+
+        const foundUser = users.find((u: any) => u.email === email && u.password === password);
+        const isHardcoded = email === "sample1@test.com" && password === "pass123";
+
+        if (foundUser || isHardcoded) {
+          localStorage.setItem("isAuthenticated", "true");
+          const userToSave = foundUser || { 
+            name: "Admin User", 
+            email: "admin@cutoptix.com",
+            role: "Project Manager"
+          };
+          localStorage.setItem("currentUser", JSON.stringify(userToSave));
+          toast.success(`Welcome back${foundUser ? `, ${foundUser.name}` : ""}!`);
+          navigate("/");
+        } else {
+          toast.error("Invalid email or password.");
+        }
       }
       setIsLoading(false);
     }, 800);
@@ -72,11 +112,44 @@ export function LoginPage() {
 
           <div className="flex-1 flex flex-col justify-center max-w-[400px] mx-auto w-full">
             <div className="text-center md:text-left mb-10">
-              <h2 className="text-3xl lg:text-4xl font-serif text-gray-900 mb-2">Welcome Back</h2>
-              <p className="text-gray-500 text-sm">Enter your email and password to access your account</p>
+              <h2 className="text-3xl lg:text-4xl font-serif text-gray-900 mb-2">
+                {isSignUp ? "Create Account" : "Welcome Back"}
+              </h2>
+              <p className="text-gray-500 text-sm">
+                {isSignUp 
+                  ? "Enter your details to create your account" 
+                  : "Enter your email and password to access your account"}
+              </p>
             </div>
 
-            <form onSubmit={handleLogin} className="space-y-6">
+            <form onSubmit={handleAuth} className="space-y-4">
+              {isSignUp && (
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700 ml-1">Full Name</label>
+                  <input
+                    type="text"
+                    placeholder="Enter your name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full h-11 px-4 bg-gray-50 border-none rounded-xl text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-gray-200 transition-all outline-none"
+                    required
+                  />
+                </div>
+              )}
+
+              {isSignUp && (
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700 ml-1">Role</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Fabricator, Manager"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    className="w-full h-11 px-4 bg-gray-50 border-none rounded-xl text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-gray-200 transition-all outline-none"
+                    required
+                  />
+                </div>
+              )}
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 ml-1">Email</label>
                 <input
@@ -84,7 +157,7 @@ export function LoginPage() {
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full h-12 px-4 bg-gray-50 border-none rounded-xl text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-gray-200 transition-all outline-none"
+                  className="w-full h-11 px-4 bg-gray-50 border-none rounded-xl text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-gray-200 transition-all outline-none"
                   required
                 />
               </div>
@@ -97,7 +170,7 @@ export function LoginPage() {
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full h-12 px-4 bg-gray-50 border-none rounded-xl text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-gray-200 transition-all outline-none"
+                    className="w-full h-11 px-4 bg-gray-50 border-none rounded-xl text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-gray-200 transition-all outline-none"
                     required
                   />
                   <button
@@ -109,6 +182,20 @@ export function LoginPage() {
                   </button>
                 </div>
               </div>
+
+              {isSignUp && (
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700 ml-1">Confirm Password</label>
+                  <input
+                    type="password"
+                    placeholder="Confirm your password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full h-11 px-4 bg-gray-50 border-none rounded-xl text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-gray-200 transition-all outline-none"
+                    required
+                  />
+                </div>
+              )}
 
               <div className="flex items-center justify-between px-1">
                 <label className="flex items-center gap-2 cursor-pointer group">
@@ -129,9 +216,9 @@ export function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-12 bg-[#030213] text-white rounded-xl font-medium hover:bg-black/90 transition-all active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100 mt-2"
+                className="w-full h-11 bg-[#030213] text-white rounded-xl font-medium hover:bg-black/90 transition-all active:scale-[0.98] disabled:opacity-70 disabled:active:scale-100 mt-2"
               >
-                {isLoading ? "Signing in..." : "Sign In"}
+                {isLoading ? (isSignUp ? "Creating account..." : "Signing in...") : (isSignUp ? "Sign Up" : "Sign In")}
               </button>
 
               <button
@@ -160,9 +247,15 @@ export function LoginPage() {
               </button>
             </form>
 
-            <div className="mt-12 text-center">
+            <div className="mt-8 text-center">
               <p className="text-gray-500 text-sm">
-                Don't have an account? <Link to="#" className="text-gray-900 font-bold hover:underline">Sign Up</Link>
+                {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+                <button 
+                  onClick={() => setIsSignUp(!isSignUp)} 
+                  className="text-gray-900 font-bold hover:underline bg-transparent border-none p-0"
+                >
+                  {isSignUp ? "Sign In" : "Sign Up"}
+                </button>
               </p>
             </div>
           </div>

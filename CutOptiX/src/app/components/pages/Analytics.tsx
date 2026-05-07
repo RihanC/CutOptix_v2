@@ -91,11 +91,11 @@ export function Analytics() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900">Analytics</h2>
-          <p className="text-gray-500 mt-1">Performance metrics and insights</p>
+          <h2 className="text-2xl font-semibold text-foreground">Analytics</h2>
+          <p className="text-muted-foreground mt-1">Performance metrics and insights</p>
         </div>
         <div className="flex gap-2">
-          <select className="px-4 py-2 border border-gray-300 rounded-lg text-sm bg-white">
+          <select className="px-4 py-2 border border-border rounded-lg text-sm bg-card text-foreground outline-none">
             <option>Last 7 months</option>
             <option>Last 30 days</option>
             <option>Last 90 days</option>
@@ -110,8 +110,8 @@ export function Analytics() {
           <Card key={kpi.title} className="p-6">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-gray-600">{kpi.title}</p>
-                <p className="text-3xl font-semibold text-gray-900 mt-2">{kpi.value}</p>
+                <p className="text-sm text-muted-foreground">{kpi.title}</p>
+                <p className="text-3xl font-semibold text-foreground mt-2">{kpi.value}</p>
                 <div className="flex items-center gap-1 mt-2">
                   {kpi.trend === "up" ? (
                     <TrendingUp className="w-4 h-4 text-green-600" />
@@ -130,12 +130,12 @@ export function Analytics() {
               <div
                 className={`p-3 rounded-lg ${
                   kpi.color === "green"
-                    ? "bg-green-100"
+                    ? "bg-green-100 dark:bg-green-900/30"
                     : kpi.color === "blue"
-                    ? "bg-blue-100"
+                    ? "bg-blue-100 dark:bg-blue-900/30"
                     : kpi.color === "purple"
-                    ? "bg-purple-100"
-                    : "bg-orange-100"
+                    ? "bg-purple-100 dark:bg-purple-900/30"
+                    : "bg-orange-100 dark:bg-orange-900/30"
                 }`}
               >
                 <kpi.icon
@@ -159,18 +159,20 @@ export function Analytics() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Cost Trend Chart */}
         <Card className="p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Cost Trends</h3>
+          <h3 className="font-semibold text-foreground mb-4">Cost Trends</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={costTrendData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="month" stroke="#6b7280" fontSize={12} />
-              <YAxis stroke="#6b7280" fontSize={12} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+              <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={12} />
+              <YAxis stroke="var(--muted-foreground)" fontSize={12} />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#fff",
-                  border: "1px solid #e5e7eb",
+                  backgroundColor: "var(--card)",
+                  border: "1px solid var(--border)",
                   borderRadius: "8px",
+                  color: "var(--foreground)"
                 }}
+                itemStyle={{ color: "var(--foreground)" }}
               />
               <Legend />
               <Line
@@ -187,7 +189,7 @@ export function Analytics() {
 
         {/* Material Usage Pie Chart */}
         <Card className="p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Material Usage Distribution</h3>
+          <h3 className="font-semibold text-foreground mb-4">Material Usage Distribution</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -199,6 +201,7 @@ export function Analytics() {
                 outerRadius={100}
                 fill="#8884d8"
                 dataKey="value"
+                stroke="var(--card)"
               >
                 {materialUsageData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
@@ -212,18 +215,20 @@ export function Analytics() {
 
       {/* Charts Row 2 */}
       <Card className="p-6">
-        <h3 className="font-semibold text-gray-900 mb-4">Monthly Projects Status</h3>
+        <h3 className="font-semibold text-foreground mb-4">Monthly Projects Status</h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={monthlyProjectsData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis dataKey="month" stroke="#6b7280" fontSize={12} />
-            <YAxis stroke="#6b7280" fontSize={12} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+            <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={12} />
+            <YAxis stroke="var(--muted-foreground)" fontSize={12} />
             <Tooltip
               contentStyle={{
-                backgroundColor: "#fff",
-                border: "1px solid #e5e7eb",
+                backgroundColor: "var(--card)",
+                border: "1px solid var(--border)",
                 borderRadius: "8px",
+                color: "var(--foreground)"
               }}
+              itemStyle={{ color: "var(--foreground)" }}
             />
             <Legend />
             <Bar dataKey="completed" fill="#10b981" name="Completed" radius={[4, 4, 0, 0]} />
@@ -235,38 +240,38 @@ export function Analytics() {
 
       {/* Insights */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="p-6 bg-green-50 border-green-200">
+        <Card className="p-6 bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-900/30">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
               <TrendingUp className="w-4 h-4 text-white" />
             </div>
-            <h4 className="font-medium text-green-900">Revenue Growth</h4>
+            <h4 className="font-medium text-green-900 dark:text-green-400">Revenue Growth</h4>
           </div>
-          <p className="text-sm text-green-700">
+          <p className="text-sm text-green-700 dark:text-green-300">
             Revenue increased by 12.5% year-to-date, with March being the highest performing month.
           </p>
         </Card>
 
-        <Card className="p-6 bg-blue-50 border-blue-200">
+        <Card className="p-6 bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-900/30">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <Package className="w-4 h-4 text-white" />
             </div>
-            <h4 className="font-medium text-blue-900">Efficiency Improvement</h4>
+            <h4 className="font-medium text-blue-900 dark:text-blue-400">Efficiency Improvement</h4>
           </div>
-          <p className="text-sm text-blue-700">
+          <p className="text-sm text-blue-700 dark:text-blue-300">
             Material efficiency improved to 92.8%, saving costs and reducing environmental impact.
           </p>
         </Card>
 
-        <Card className="p-6 bg-purple-50 border-purple-200">
+        <Card className="p-6 bg-purple-50 dark:bg-purple-900/10 border-purple-200 dark:border-purple-900/30">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
               <BarChart3 className="w-4 h-4 text-white" />
             </div>
-            <h4 className="font-medium text-purple-900">Project Completion</h4>
+            <h4 className="font-medium text-purple-900 dark:text-purple-400">Project Completion</h4>
           </div>
-          <p className="text-sm text-purple-700">
+          <p className="text-sm text-purple-700 dark:text-purple-300">
             Average of 20 projects completed per month with 95% on-time delivery rate.
           </p>
         </Card>
