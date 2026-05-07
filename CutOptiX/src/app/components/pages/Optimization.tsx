@@ -9,7 +9,9 @@ import {
   BarChart3
 } from "lucide-react";
 import { useNavigate } from "react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Skeleton } from "../ui/skeleton";
+import { motion } from "framer-motion";
 
 const bars = [
   {
@@ -78,6 +80,14 @@ const stats = [
 export function Optimization() {
   const navigate = useNavigate();
   const [isOptimizing, setIsOptimizing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleFinish = () => {
     setIsOptimizing(true);
@@ -102,13 +112,64 @@ export function Optimization() {
     }, 1500);
   };
 
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl space-y-6">
+        <div className="flex justify-between items-center">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+          <Skeleton className="h-10 w-40" />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i} className="p-5">
+              <div className="flex items-start gap-3">
+                <Skeleton className="h-10 w-10 rounded-lg" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-6 w-16" />
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        <Card className="p-6">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-10 w-10 rounded-lg" />
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-48" />
+                <Skeleton className="h-4 w-64" />
+              </div>
+            </div>
+            <div className="space-y-8 pt-8">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="space-y-3">
+                  <div className="flex justify-between">
+                    <Skeleton className="h-5 w-24" />
+                    <Skeleton className="h-5 w-32" />
+                  </div>
+                  <Skeleton className="h-20 w-full" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900">Optimization</h2>
-          <p className="text-gray-500 mt-1">Bar cutting optimization and waste minimization</p>
+          <h2 className="text-2xl font-semibold text-foreground">Optimization</h2>
+          <p className="text-muted-foreground mt-1">Bar cutting optimization and waste minimization</p>
         </div>
         <Button 
           onClick={handleFinish} 
@@ -128,29 +189,29 @@ export function Optimization() {
               <div
                 className={`p-2.5 rounded-lg ${
                   stat.color === "blue"
-                    ? "bg-blue-100"
+                    ? "bg-blue-100 dark:bg-blue-900/30"
                     : stat.color === "orange"
-                    ? "bg-orange-100"
+                    ? "bg-orange-100 dark:bg-orange-900/30"
                     : stat.color === "green"
-                    ? "bg-green-100"
-                    : "bg-purple-100"
+                    ? "bg-green-100 dark:bg-green-900/30"
+                    : "bg-purple-100 dark:bg-purple-900/30"
                 }`}
               >
                 <stat.icon
                   className={`w-5 h-5 ${
                     stat.color === "blue"
-                      ? "text-blue-600"
+                      ? "text-blue-600 dark:text-blue-400"
                       : stat.color === "orange"
-                      ? "text-orange-600"
+                      ? "text-orange-600 dark:text-orange-400"
                       : stat.color === "green"
-                      ? "text-green-600"
-                      : "text-purple-600"
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-purple-600 dark:text-purple-400"
                   }`}
                 />
               </div>
               <div>
-                <p className="text-sm text-gray-600">{stat.label}</p>
-                <p className="text-2xl font-semibold text-gray-900 mt-1">{stat.value}</p>
+                <p className="text-sm text-muted-foreground">{stat.label}</p>
+                <p className="text-2xl font-semibold text-foreground mt-1">{stat.value}</p>
               </div>
             </div>
           </Card>
@@ -159,14 +220,14 @@ export function Optimization() {
 
       {/* Optimization Visualization */}
       <Card className="overflow-hidden">
-        <div className="p-6 border-b border-gray-200 bg-gray-50">
+        <div className="p-6 border-b border-border bg-muted/30">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Scissors className="w-5 h-5 text-blue-600" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <Scissors className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">Cutting Plan Visualization</h3>
-              <p className="text-sm text-gray-500">Visual representation of optimized bar cuts</p>
+              <h3 className="font-semibold text-foreground">Cutting Plan Visualization</h3>
+              <p className="text-sm text-muted-foreground">Visual representation of optimized bar cuts</p>
             </div>
           </div>
         </div>
@@ -179,20 +240,20 @@ export function Optimization() {
                 {/* Bar Header */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="font-medium text-gray-900">{bar.id}</h4>
-                    <p className="text-sm text-gray-500">
+                    <h4 className="font-medium text-foreground">{bar.id}</h4>
+                    <p className="text-sm text-muted-foreground">
                       Total: {bar.length}mm | Used: {totalCutLength}mm | Waste: {bar.waste}mm
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">Efficiency:</span>
+                    <span className="text-sm text-muted-foreground">Efficiency:</span>
                     <span
                       className={`text-sm font-medium ${
                         bar.efficiency >= 95
-                          ? "text-green-600"
+                          ? "text-green-500"
                           : bar.efficiency >= 90
-                          ? "text-blue-600"
-                          : "text-orange-600"
+                          ? "text-blue-500"
+                          : "text-orange-500"
                       }`}
                     >
                       {bar.efficiency}%
@@ -201,7 +262,7 @@ export function Optimization() {
                 </div>
 
                 {/* Bar Visualization */}
-                <div className="relative h-20 bg-gray-100 rounded-lg overflow-hidden">
+                <div className="relative h-20 bg-muted rounded-lg overflow-hidden border border-border">
                   {/* Cuts */}
                   <div className="absolute inset-0 flex">
                     {bar.cuts.map((cut, index) => {
@@ -270,27 +331,27 @@ export function Optimization() {
       </Card>
 
       {/* Legend */}
-      <Card className="p-6 bg-gray-50">
+      <Card className="p-6 bg-muted/30 border-border">
         <div className="flex flex-wrap gap-6">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-blue-500 rounded"></div>
-            <span className="text-sm text-gray-700">Window Cut</span>
+            <span className="text-sm text-muted-foreground">Window Cut</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-purple-500 rounded"></div>
-            <span className="text-sm text-gray-700">Door Cut</span>
+            <span className="text-sm text-muted-foreground">Door Cut</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-gradient-to-r from-orange-300 to-red-400 rounded"></div>
-            <span className="text-sm text-gray-700">Waste Material</span>
+            <span className="text-sm text-muted-foreground">Waste Material</span>
           </div>
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-green-600" />
-            <span className="text-sm text-gray-700">&gt;95% Efficiency</span>
+            <CheckCircle2 className="w-4 h-4 text-green-500" />
+            <span className="text-sm text-muted-foreground">&gt;95% Efficiency</span>
           </div>
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-orange-600" />
-            <span className="text-sm text-gray-700">&lt;90% Efficiency</span>
+            <AlertTriangle className="w-4 h-4 text-orange-500" />
+            <span className="text-sm text-muted-foreground">&lt;90% Efficiency</span>
           </div>
         </div>
       </Card>

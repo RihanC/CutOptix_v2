@@ -7,8 +7,8 @@ import {
   Package
 } from "lucide-react";
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   BarChart,
   Bar,
   PieChart,
@@ -84,6 +84,39 @@ const kpiData = [
     color: "orange",
   },
 ];
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-card/90 backdrop-blur-md border border-border p-4 rounded-xl shadow-xl ring-1 ring-white/10">
+        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2 font-heading">{label}</p>
+        {payload.map((item: any, index: number) => (
+          <div key={index} className="space-y-1">
+            <div className="flex items-center justify-between gap-8">
+              <span className="text-sm font-medium text-foreground">{item.name}:</span>
+              <span className="text-sm font-bold text-primary">
+                {typeof item.value === 'number' && item.name.includes('Cost') 
+                  ? `₹${item.value.toLocaleString()}` 
+                  : item.value}
+              </span>
+            </div>
+            {item.payload.projects && item.name.includes('Cost') && (
+              <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                <span>Projects:</span>
+                <span>{item.payload.projects}</span>
+              </div>
+            )}
+          </div>
+        ))}
+        <div className="mt-2 pt-2 border-t border-border flex items-center gap-1">
+          <TrendingUp className="w-3 h-3 text-green-500" />
+          <span className="text-[10px] font-medium text-green-500">+4.2% vs last month</span>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
 
 export function Analytics() {
   return (
@@ -161,29 +194,40 @@ export function Analytics() {
         <Card className="p-6">
           <h3 className="font-semibold text-foreground mb-4">Cost Trends</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={costTrendData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={12} />
-              <YAxis stroke="var(--muted-foreground)" fontSize={12} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "var(--card)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "8px",
-                  color: "var(--foreground)"
-                }}
-                itemStyle={{ color: "var(--foreground)" }}
+            <AreaChart data={costTrendData}>
+              <defs>
+                <linearGradient id="colorCost" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+              <XAxis 
+                dataKey="month" 
+                stroke="var(--muted-foreground)" 
+                fontSize={12} 
+                tickLine={false}
+                axisLine={false}
+                dy={10}
               />
-              <Legend />
-              <Line
+              <YAxis 
+                stroke="var(--muted-foreground)" 
+                fontSize={12} 
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(value) => `₹${value/1000}k`}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Area
                 type="monotone"
                 dataKey="cost"
                 stroke="#3b82f6"
-                strokeWidth={2}
-                name="Total Cost (₹)"
-                dot={{ fill: "#3b82f6", r: 4 }}
+                strokeWidth={3}
+                fillOpacity={1}
+                fill="url(#colorCost)"
+                name="Total Cost"
               />
-            </LineChart>
+            </AreaChart>
           </ResponsiveContainer>
         </Card>
 
@@ -207,7 +251,7 @@ export function Analytics() {
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip content={<CustomTooltip />} />
             </PieChart>
           </ResponsiveContainer>
         </Card>
@@ -218,22 +262,26 @@ export function Analytics() {
         <h3 className="font-semibold text-foreground mb-4">Monthly Projects Status</h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={monthlyProjectsData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-            <XAxis dataKey="month" stroke="var(--muted-foreground)" fontSize={12} />
-            <YAxis stroke="var(--muted-foreground)" fontSize={12} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "var(--card)",
-                border: "1px solid var(--border)",
-                borderRadius: "8px",
-                color: "var(--foreground)"
-              }}
-              itemStyle={{ color: "var(--foreground)" }}
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+            <XAxis 
+              dataKey="month" 
+              stroke="var(--muted-foreground)" 
+              fontSize={12} 
+              tickLine={false}
+              axisLine={false}
+              dy={10}
             />
-            <Legend />
-            <Bar dataKey="completed" fill="#10b981" name="Completed" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="inProgress" fill="#3b82f6" name="In Progress" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="pending" fill="#f59e0b" name="Pending" radius={[4, 4, 0, 0]} />
+            <YAxis 
+              stroke="var(--muted-foreground)" 
+              fontSize={12} 
+              tickLine={false}
+              axisLine={false}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend verticalAlign="top" height={36}/>
+            <Bar dataKey="completed" fill="#10b981" name="Completed" radius={[4, 4, 0, 0]} barSize={20} />
+            <Bar dataKey="inProgress" fill="#3b82f6" name="In Progress" radius={[4, 4, 0, 0]} barSize={20} />
+            <Bar dataKey="pending" fill="#f59e0b" name="Pending" radius={[4, 4, 0, 0]} barSize={20} />
           </BarChart>
         </ResponsiveContainer>
       </Card>
